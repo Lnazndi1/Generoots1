@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Generoots</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins&display=swap">
+<script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+<script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+<style>
+* {margin:0; padding:0; box-sizing:border-box; font-family:'Poppins',sans-serif;}
+html,body{height:100%; margin:0;}
+body {background:url('images/IMG_6072.jpeg') no-repeat center center fixed; background-size:cover;}
+header {width:100%; display:flex; justify-content:space-between; align-items:center; padding:10px 5%; position:fixed; top:0; left:0; z-index:1000; background-color:transparent;}
+.logo {color:#f0f8ff; font-size:24px; font-weight:bold;}
+.navigation {display:flex; flex-wrap:wrap; gap:20px; align-items:center;}
+.navigation a {position:relative; padding:8px 15px; border-radius:6px; color:#f0f8ff; text-decoration:none; transition:color 0.3s, background-color 0.3s;}
+.navigation a::after {content:''; position:absolute; left:0; bottom:0; width:100%; height:3px; background:#f0f8ff; border-radius:5px; transform:scaleX(0); transform-origin:left; transition:transform 0.3s;}
+.navigation a:hover::after {transform:scaleX(1);}
+.navigation a:hover {color:#0b1436;}
+.hamburger {display:none; flex-direction:column; justify-content:space-between; width:25px; height:20px; cursor:pointer; position:absolute; top:15px; right:20px; z-index:1001;}
+.hamburger span {display:block; height:3px; background-color:#f0f8ff; border-radius:3px;}
+@media screen and (max-width:768px){
+  .hamburger {display:flex;}
+  .navigation {position:absolute; top:60px; right:0; width:200px; background:rgba(0,0,0,0.8); flex-direction:column; gap:0; padding:10px 0; border-radius:0 0 10px 10px; transform:translateX(100%); transition:transform 0.3s ease;}
+  .navigation.active {transform:translateX(0);}
+  .navigation a {width:100%; text-align:center; margin:10px 0;}
+  /* تعديل اسم المشروع في الوسط */
+  header {justify-content:center; position:relative;}
+  .logo {position:absolute; left:50%; transform:translateX(-50%);}
+  .hamburger {position:absolute; right:10px; top:15px;}
+}
+/* Popup */
+.popup-wrapper {position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.2); backdrop-filter:blur(3px); display:none; justify-content:center; align-items:center; z-index:2000;}
+.popup-content {background: rgba(255,255,255,0.85); backdrop-filter: blur(10px); padding: 40px 50px; border-radius: 20px; max-width: 700px; width:90%; color:#0b1436; text-align:right; position:relative; box-shadow:0 8px 32px rgba(0,0,0,0.2);}
+.popup-content .close-btn {position:absolute; top:15px; left:15px; font-size:25px; cursor:pointer; color:#162938;}
+.popup-footer {margin-top:25px; text-align:center;}
+.popup-footer p {margin-bottom:15px; font-size:16px; color:#0b1436;}
+.social-icons {display:flex; justify-content:center; gap:20px;}
+.social-icons a {display:flex; justify-content:center; align-items:center; width:50px; height:50px; border-radius:50%; background:#fff; color:#0b1436; font-size:28px; text-decoration:none; box-shadow:0 4px 10px rgba(0,0,0,0.2); transition: transform 0.3s, background 0.3s, color 0.3s;}
+.social-icons a:hover {transform: scale(1.2); background:#e6e6e6;}
+.social-icons a[name="logo-twitter"] {color:#1DA1F2; font-size:32px;}
+.social-icons a[name="logo-instagram"] {color:#C13584; font-size:32px;}
+/* DNA Section */
+.dna-section {display:none; flex-direction:column; align-items:center; margin-top:150px;}
+.dna-input-wrapper {display:flex; flex-direction:column; gap:20px; backdrop-filter: blur(15px); background: rgba(255,255,255,0.15); padding:30px 40px; border-radius:25px; box-shadow: 0 8px 32px rgba(0,0,0,0.3); text-align:center; max-width:500px; width:90%;}
+.dna-input-wrapper input {padding:15px 20px; border-radius:15px; border:none; font-size:18px; outline:none; text-align:center; color:#0b1436; background: rgba(255,255,255,0.4); backdrop-filter: blur(10px);}
+.dna-input-wrapper input::placeholder {color:#162938; opacity:0.7;}
+.dna-input-wrapper button {padding:15px 0; border:none; border-radius:15px; background:#1DA1F2; color:#fff; font-size:18px; cursor:pointer; transition: all 0.3s ease;}
+.dna-input-wrapper button:hover {background:#0d8ddb; transform:scale(1.05);}
+.result-wrapper {margin-top:30px; display:flex; flex-direction:column; align-items:center;}
+.person-card {display:flex; flex-direction:column; align-items:center; gap:10px; background: rgba(255,255,255,0.2); backdrop-filter: blur(10px); padding:20px 30px; border-radius:20px; box-shadow:0 6px 20px rgba(0,0,0,0.2); max-width:350px; text-align:center;}
+.person-img {width:120px; height:120px; border-radius:50%;}
+.person-name {font-size:22px; color:#0b1436; font-weight:bold;}
+.person-match, .person-relation {font-size:16px; color:#0b1436;}
+.view-profile-btn {padding:10px 20px; border:none; border-radius:15px; background:#C13584; color:#fff; font-size:16px; cursor:pointer; transition: all 0.3s ease;}
+.view-profile-btn:hover {background:#a1286c; transform:scale(1.05);}
+/* الملف الشخصي */
+.profile-section {display:none; flex-direction:column; align-items:center; margin-top:150px;}
+.profile-card {background: rgba(255,255,255,0.15); backdrop-filter: blur(15px); padding:30px 40px; border-radius:25px; box-shadow:0 8px 32px rgba(0,0,0,0.3); max-width:700px; width:90%; display:flex; flex-wrap:wrap; gap:15px; justify-content:space-between;}
+.profile-card label {width:100%; font-weight:bold; color:#0b1436; margin-top:10px;}
+.profile-card input {padding:12px 15px; border-radius:10px; border:none; outline:none; font-size:16px; flex:1 1 45%; min-width:150px;}
+.profile-card button {padding:12px 0; border:none; border-radius:12px; font-size:16px; cursor:pointer; transition:all 0.3s; color:#fff; flex:1 1 45%; min-width:120px;}
+.save-btn {background:#1DA1F2;}
+.save-btn:hover {background:#0d8ddb;}
+.edit-btn {background:#C13584;}
+.edit-btn:hover {background:#a1286c;}
+.file-input-wrapper {position:relative; display:inline-block; cursor:pointer;}
+.file-input-wrapper input[type="file"] {opacity:0; position:absolute; left:0; top:0; width:100%; height:100%; cursor:pointer;}
+/* قسم التعليقات */
+.comments-section {display:none; flex-direction:column; align-items:center; margin-top:150px;}
+.comment-card {background: #ffffff; padding:15px 20px; border-radius:15px; margin:10px 0; width:90%; max-width:500px; box-shadow:0 4px 12px rgba(0,0,0,0.2);}
+.comment-card p {margin:5px 0; color:#0b1436;}
+.comment-card .rating {color:#f1c40f; font-size:18px;}
+.comment-form {display:flex; flex-direction:column; gap:10px; background: rgba(255,255,255,0.15); padding:20px 25px; border-radius:20px; max-width:500px; width:90%; box-shadow:0 6px 20px rgba(0,0,0,0.2);}
+.comment-form textarea {padding:10px; border-radius:10px; border:none; outline:none; resize:none; font-size:16px;}
+.comment-form .stars {display:flex; justify-content:flex-start; gap:5px; cursor:pointer; font-size:24px;}
+.comment-form .star {color:#ccc; transition: color 0.3s;}
+.comment-form .star.selected, .comment-form .star.hover {color:#f1c40f;}
+.comment-form button {padding:12px 0; border:none; border-radius:12px; background:#1DA1F2; color:#fff; cursor:pointer; transition:all 0.3s;}
+.comment-form button:hover {background:#0d8ddb;}
+.home-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  gap: 30px;
+  text-align: center;
+}
+
+.home-icon {
+  cursor: pointer;
+  transition: transform 0.3s;
+}
+
+.home-icon:hover {
+  transform: scale(1.2);
+}
+
+.home-text {
+  max-width: 700px;
+  color: #fff;
+  font-size: 20px;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 20px;
+  border-radius: 20px;
+  display: none;
+  text-align: right;
+}
+/* مودال الملف الشخصي للأشخاص بعد التحليل */
+/* مودال عرض الملف الشخصي للشخص بعد التحليل */
+.person-modal-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.3);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 3000;
+}
+
+.person-modal-content {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  padding: 25px 30px;
+  border-radius: 20px;
+  max-width: 400px;
+  width: 90%;
+  text-align: center;
+  position: relative;
+}
+
+.person-modal-content img {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  margin-bottom: 15px;
+}
+
+.person-modal-content h3 {
+  margin-bottom: 10px;
+  color: #0b1436;
+}
+
+.person-modal-content p {
+  margin: 5px 0;
+  color: #0b1436;
+}
+
+/* تعديل مودال الملف الشخصي ليشمل التفاصيل الإضافية */
+.person-modal-content .person-details {
+  margin-bottom: 10px;
+  font-size: 16px;
+  color: #0b1436;
+}
+
+/* رسالة عدم التطابق DNA */
+.result-wrapper .no-match {
+  background: rgba(255, 0, 0, 0.2);
+  border: 2px solid #ff0000;
+  border-radius: 15px;
+  padding: 20px 25px;
+  font-size: 18px;
+  font-weight: bold;
+  color: #0b1436;
+  text-align: center;
+  max-width: 400px;
+  margin-top: 20px;
+}
+
+.person-modal-content .close-modal {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  font-size: 22px;
+  cursor: pointer;
+  color: #ff4d4d;
+  font-weight: bold;
+}
+</style>
+</head>
+<body>
+<header>
+<h2 class="logo">Generoots</h2>
+<div class="hamburger"><span></span><span></span><span></span></div>
+<nav class="navigation">
+<a href="#" id="aboutBtn">عن الموقع</a>
+<a href="#" id="commentsNav">آراء المستخدمين</a>
+<a href="#" id="analysisNav">ابدأ التحليل</a>
+<a href="#" id="profileNav">الملف الشخصي</a>
+</nav>
+</header>
+
+<!-- الصفحة الرئيسية -->
+<div class="home-section" id="homeSection">
+  <div class="home-icon" id="homeDNAIcon">
+    <ion-icon name="finger-print-outline" style="font-size:70px;color:#fff;"></ion-icon>
+  </div>
+  <div class="home-text" id="homeText"></div>
+</div>
+<!-- Popup عن الموقع -->
+<div class="popup-wrapper" id="aboutPopup">
+  <div class="popup-content">
+    <span class="close-btn">&times;</span>
+    <h2>عن الموقع</h2>
+    <p>يُعد هذا الموقع مساحة رقمية مبتكرة تهدف إلى تقديم محتوى متنوع وهادف يجمع بين المعرفة والإبداع.
+    نسعى من خلاله إلى تسهيل الوصول إلى المعلومات والأفكار بأسلوب بسيط وواضح، يساعد الزوار على الاستفادة والتعلّم والتطوير.
+    نحرص على أن يكون موقعنا منصة تفاعلية تواكب احتياجات المستخدمين وتقدّم لهم تجربة سلسة وممتعة في كل زيارة.
+    تابعونا على وسائل التواصل الاجتماعي لتبقوا على اطلاع بكل جديد ومفيد.</p>
+    <div class="popup-footer">
+      <p>لا تنسوا متابعتنا على وسائل التواصل الاجتماعي!</p>
+      <div class="social-icons">
+        <a href="https://www.instagram.com/generoots1" target="_blank" name="logo-instagram"><ion-icon name="logo-instagram"></ion-icon></a>
+        <a href="https://x.com/generoots123" target="_blank" name="logo-twitter"><ion-icon name="logo-twitter"></ion-icon></a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DNA Section -->
+<div class="dna-section">
+  <div class="dna-input-wrapper">
+    <input type="text" id="dnaInput" placeholder="أدخل سلسلة الـ DNA الخاصة بك..." maxlength="50">
+    <button id="startAnalysis">ابدأ التحليل</button>
+  </div>
+  <div class="result-wrapper" id="resultWrapper"></div>
+</div>
+
+<!-- الملف الشخصي -->
+<div class="profile-section">
+  <div class="profile-card">
+    <label>الصورة الشخصية</label>
+    <div class="file-input-wrapper">
+      <img id="profileImg" src="" alt="صورة المستخدم">
+      <input type="file" id="imgInput" accept="image/*">
+    </div>
+    <label>الاسم</label><input type="text" id="nameInput" placeholder="أدخل اسمك الثلاثي">
+    <label>رقم الهاتف</label><input type="text" id="phoneInput" placeholder="أدخل رقم الهاتف">
+    <label>البريد الإلكتروني</label><input type="email" id="emailInput" placeholder="أدخل بريدك الإلكتروني">
+    <label>كلمة المرور</label><input type="password" id="passwordInput" placeholder="أدخل كلمة المرور">
+    <label>يوم الميلاد بالهجري</label><input type="text" id="birthHijri" placeholder="مثال: 15-02-1445">
+    <label>يوم الميلاد بالميلادي</label><input type="text" id="birthGregorian" placeholder="مثال: 01-09-2023">
+    <label>الجنسية</label><input type="text" id="nationality" placeholder="أدخل جنسيتك">
+    <label>الدولة</label><input type="text" id="country" placeholder="أدخل الدولة">
+    <label>المنطقة</label><input type="text" id="region" placeholder="أدخل المنطقة">
+    <label>العمر</label><input type="number" id="ageInput" placeholder="أدخل عمرك">
+    <label>سلسلة DNA</label><input type="text" id="dnaProfile" placeholder="أدخل سلسلة DNA الخاصة بك">
+    <button class="edit-btn" id="editProfileBtn">تعديل</button>
+    <button class="save-btn" id="saveProfileBtn">حفظ</button>
+  </div>
+</div>
+
+<!-- قسم التعليقات -->
+<div class="comments-section">
+  <div class="comment-form">
+    <p style="font-weight:bold; color:#0b1436; margin-bottom:10px;">شاركنا برأيك</p>
+    <textarea id="commentInput" placeholder="أدخل تعليقك هنا..." rows="3"></textarea>
+    <div class="stars">
+      <span class="star" data-value="1">&#9733;</span>
+      <span class="star" data-value="2">&#9733;</span>
+      <span class="star" data-value="3">&#9733;</span>
+      <span class="star" data-value="4">&#9733;</span>
+      <span class="star" data-value="5">&#9733;</span>
+    </div>
+    <button id="submitComment">إرسال التعليق</button>
+  </div>
+  <div id="commentsContainer"></div>
+</div>
+<!-- مودال عرض الملف الشخصي للشخص بعد التحليل -->
+<div class="person-modal-wrapper" id="personModal">
+  <div class="person-modal-content">
+    <span class="close-modal" id="closePersonModal">&times;</span>
+    <img src="" alt="صورة الشخص" id="modalPersonImg">
+    <h3 id="modalPersonName"></h3>
+    <p id="modalPersonPhone"></p>
+    <p id="modalPersonEmail"></p>
+    <p id="modalPersonNationality"></p>
+    <p id="modalPersonMatch"></p>
+    <p id="modalPersonRelation"></p>
+  </div>
+</div>
+<script>
+<!-- الجزء الثاني: جافاسكريبت التفاعلي -->
+// --------------------
+// القائمة والهمبرغر + أنيميشن خفيف
+// --------------------
+const hamburger = document.querySelector('.hamburger');
+const nav = document.querySelector('.navigation');
+hamburger.addEventListener('click', () => {
+  nav.classList.toggle('active');
+  hamburger.classList.toggle('active');
+});
+
+// --------------------
+// Popup عن الموقع
+// --------------------
+const aboutBtn = document.getElementById('aboutBtn');
+const aboutPopup = document.getElementById('aboutPopup');
+const aboutCloseBtn = aboutPopup ? aboutPopup.querySelector('.close-btn') : null;
+
+if (aboutBtn && aboutPopup) {
+  aboutBtn.addEventListener('click', (e) => {
+    e.preventDefault(); e.stopPropagation();
+    aboutPopup.style.display = 'flex';
+  });
+}
+if (aboutCloseBtn) {
+  aboutCloseBtn.addEventListener('click', (e) => {
+    e.stopPropagation(); aboutPopup.style.display = 'none';
+  });
+}
+window.addEventListener('click', (e) => {
+  if (aboutPopup && e.target === aboutPopup) aboutPopup.style.display = 'none';
+});
+
+// --------------------
+// الأقسام: DNA - الملف الشخصي - التعليقات
+// --------------------
+const dnaSection = document.querySelector('.dna-section');
+const analysisNavLink = document.getElementById('analysisNav');
+const startBtn = document.getElementById('startAnalysis');
+const dnaInput = document.getElementById('dnaInput');
+const resultWrapper = document.getElementById('resultWrapper');
+
+const profileSection = document.querySelector('.profile-section');
+const profileImg = document.getElementById('profileImg');
+const imgInput = document.getElementById('imgInput');
+const nameInput = document.getElementById('nameInput');
+const phoneInput = document.getElementById('phoneInput');
+const emailInput = document.getElementById('emailInput');
+const passwordInput = document.getElementById('passwordInput');
+const birthHijri = document.getElementById('birthHijri');
+const birthGregorian = document.getElementById('birthGregorian');
+const nationality = document.getElementById('nationality');
+const country = document.getElementById('country');
+const region = document.getElementById('region');
+const ageInput = document.getElementById('ageInput');
+const dnaProfile = document.getElementById('dnaProfile');
+const editProfileBtn = document.getElementById('editProfileBtn');
+const saveProfileBtn = document.getElementById('saveProfileBtn');
+
+const commentsNav = document.getElementById('commentsNav');
+const commentsSection = document.querySelector('.comments-section');
+const commentInput = document.getElementById('commentInput');
+const submitComment = document.getElementById('submitComment');
+const commentsContainer = document.getElementById('commentsContainer');
+
+const homeSection = document.getElementById('homeSection');
+const homeText = document.getElementById('homeText');
+const homeDNAIcon = document.getElementById('homeDNAIcon');
+
+// --------------------
+// رفع الصور
+// --------------------
+if (profileImg) {
+  if (!profileImg.src || profileImg.src.trim() === '') profileImg.style.display = 'none';
+  else profileImg.style.display = 'block';
+}
+if (imgInput) {
+  imgInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(ev) {
+      profileImg.src = ev.target.result;
+      profileImg.style.display = 'block';
+    }
+    reader.readAsDataURL(file);
+  });
+}
+
+// --------------------
+// التنقل بين الأقسام
+// --------------------
+if (analysisNavLink) {
+  analysisNavLink.addEventListener('click', (e) => {
+    e.preventDefault(); e.stopPropagation();
+    dnaSection.style.display = 'flex';
+    profileSection.style.display = 'none';
+    commentsSection.style.display = 'none';
+    homeSection.style.display = 'none';
+    resultWrapper.innerHTML = '';
+    if (aboutPopup) aboutPopup.style.display = 'none';
+  });
+}
+const profileNavBtn = document.getElementById('profileNav');
+if (profileNavBtn) {
+  profileNavBtn.addEventListener('click', (e) => {
+    e.preventDefault(); e.stopPropagation();
+    profileSection.style.display = (profileSection.style.display==='flex')?'none':'flex';
+    dnaSection.style.display = 'none';
+    commentsSection.style.display = 'none';
+    homeSection.style.display = 'none';
+    if (aboutPopup) aboutPopup.style.display = 'none';
+  });
+}
+if (commentsNav) {
+  commentsNav.addEventListener('click', (e) => {
+    e.preventDefault(); e.stopPropagation();
+    commentsSection.style.display = 'flex';
+    profileSection.style.display = 'none';
+    dnaSection.style.display = 'none';
+    homeSection.style.display = 'none';
+    if (aboutPopup) aboutPopup.style.display = 'none';
+  });
+}
+
+// --------------------
+// النجوم التفاعلية وتعليقات المستخدم
+// --------------------
+const stars = document.querySelectorAll('.star');
+let currentRating = 0;
+if (stars && stars.length) {
+  stars.forEach(star => {
+    star.addEventListener('mouseover',()=>highlightStars(parseInt(star.dataset.value)));
+    star.addEventListener('mouseout',()=>highlightStars(currentRating));
+    star.addEventListener('click',()=>{currentRating=parseInt(star.dataset.value); highlightStars(currentRating);});
+  });
+}
+function highlightStars(rating) {
+  if (!stars) return;
+  stars.forEach(star=>{
+    if(parseInt(star.dataset.value)<=rating) star.classList.add('selected');
+    else star.classList.remove('selected');
+  });
+}
+function toggleInputs(enable) {
+  if (!profileSection) return;
+  const inputs = profileSection.querySelectorAll('input');
+  inputs.forEach(input=>input.disabled = !enable);
+}
+if (editProfileBtn) editProfileBtn.addEventListener('click',()=>{toggleInputs(true);});
+if (saveProfileBtn) saveProfileBtn.addEventListener('click',()=>{toggleInputs(false); alert('تم حفظ البيانات بنجاح!');});
+function loadComments() {
+  const saved = JSON.parse(localStorage.getItem('comments')) || [];
+  if (!commentsContainer) return;
+  commentsContainer.innerHTML='';
+  saved.forEach(c=>{
+    const div=document.createElement('div');
+    div.classList.add('comment-card');
+    div.innerHTML=`<p>${c.text}</p><p class="rating">${'★'.repeat(c.rating)+'☆'.repeat(5-c.rating)}</p>`;
+    commentsContainer.appendChild(div);
+  });
+}
+loadComments();
+if (submitComment) {
+  submitComment.addEventListener('click',()=>{
+    const text = commentInput.value.trim();
+    if(!text){alert('يرجى إدخال تعليق'); return;}
+    const saved = JSON.parse(localStorage.getItem('comments')) || [];
+    saved.push({text,rating:currentRating});
+    localStorage.setItem('comments',JSON.stringify(saved));
+    commentInput.value=''; currentRating=0; highlightStars(0);
+    loadComments();
+  });
+}
+
+// --------------------
+// تحليل DNA وفتح الملف الشخصي للمطابقة (مودال)
+// --------------------
+const correctDNA = "ATGCACGTATCC";
+const ahmedData = {
+  name: "أحمد العلي",
+  phone: "0501234567",
+  email: "ahmed@example.com",
+  img: "images/IMG_6278.jpeg",
+  match: "100%",
+  relation:"ابن من الدرجة الاولى" ,
+  nationality: "سعودي"
+};
+
+if (startBtn) {
+  startBtn.addEventListener('click', () => {
+    const dnaValue = dnaInput.value.replace(/\s+/g,'').toUpperCase();
+    resultWrapper.innerHTML = '';
+    if(dnaValue===''){ alert('يرجى إدخال سلسلة DNA قبل البدء!'); return; }
+    if(dnaValue===correctDNA){
+      const card=document.createElement('div');
+      card.classList.add('person-card');
+      card.innerHTML=`
+        <img src="${ahmedData.img}" alt="صورة الشخص" class="person-img">
+        <h3 class="person-name">${ahmedData.name}</h3>
+        <p class="person-match">نسبة التطابق: ${ahmedData.match}</p>
+        <p class="person-relation">صلة القرابة: ${ahmedData.relation}</p>
+        <button class="view-profile-btn">عرض الملف الشخصي</button>
+      `;
+      resultWrapper.appendChild(card);
+
+      const viewBtn=card.querySelector('.view-profile-btn');
+      if(viewBtn){
+        viewBtn.addEventListener('click',()=>{
+          const modal = document.getElementById('personModal');
+          if(!modal) return;
+          document.getElementById('modalPersonImg').src = ahmedData.img;
+document.getElementById('modalPersonName').textContent = ahmedData.name;
+document.getElementById('modalPersonPhone').textContent = `رقم الهاتف: ${ahmedData.phone}`;
+document.getElementById('modalPersonEmail').textContent = `البريد الإلكتروني: ${ahmedData.email}`;
+document.getElementById('modalPersonNationality').textContent = `الجنسية: ${ahmedData.nationality}`;
+document.getElementById('modalPersonMatch').textContent = `نسبة التطابق: ${ahmedData.match}`;
+document.getElementById('modalPersonRelation').textContent = `صلة القرابة: ${ahmedData.relation}`;
+          modal.style.display='flex';
+        });
+      }
+    } else {
+      const msg = document.createElement('p');
+      msg.classList.add('no-match');
+      msg.textContent = "لا يوجد تطابق لسلسلة DNA هذه.";
+      resultWrapper.appendChild(msg);
+    }
+    resultWrapper.scrollIntoView({behavior:'smooth'});
+  });
+}
+
+// إغلاق مودال الشخص
+const closePersonBtn = document.getElementById('closePersonModal');
+if(closePersonBtn){
+  closePersonBtn.addEventListener('click',()=>{
+    const modal=document.getElementById('personModal');
+    if(modal) modal.style.display='none';
+  });
+}
+window.addEventListener('click',(e)=>{
+  const modal=document.getElementById('personModal');
+  if(modal && e.target===modal) modal.style.display='none';
+});
+
+// --------------------
+// الصفحة الرئيسية + أيقونة DNA
+// --------------------
+let dnaStep=0;
+if(homeDNAIcon){
+  homeDNAIcon.addEventListener('click',()=>{
+    homeText.style.display='block';
+    if(dnaStep===0){
+      homeText.innerHTML=`
+        <h2>حلّل سلسلة الـDNA واكتشف نسبة التطابق</h2>
+        <p>أدخل سلسلة الحمض النووي الخاصة بك، وسيقوم النظام بمقارنتها لإظهار أقرب السلاسل المشابهة لك</p>`;
+      dnaStep++;
+    } else if(dnaStep===1){
+      homeText.innerHTML=`
+        <h2>لماذا Generoots ؟</h2>
+        <p>🧬 تحليل مباشر<br> بدون رفع ملفات أو تحميل أي شيء. فقط الصق السلسلة.</p>
+        <p>⚡ نتائج فورية<br> يظهر لك التطابق مباشرة بعد التحليل.</p>
+        <p>🎯 دقة مبسّطة<br> يحسب النظام نسبة التشابه بين سلسلتك والسلاسل المسجلة داخل النظام.</p>
+        <p>© 2025 Generoots — جميع الحقوق محفوظة</p>`;
+      dnaStep++;
+    } else {
+      homeText.style.display='none'; dnaStep=0;
+    }
+  });
+}
+
+</script>
+</body>
+</html>
